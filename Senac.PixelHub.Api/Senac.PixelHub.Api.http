@@ -1,0 +1,6 @@
+@Senac.PixelHub.Api_HostAddress = http://localhost:5109
+
+GET {{Senac.PixelHub.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
