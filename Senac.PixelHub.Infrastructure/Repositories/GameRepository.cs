@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Senac.PixelHub.Domain.Entities;
-using Senac.PixelHub.Domain.Repositories.Games
+using Senac.PixelHub.Domain.Repositories.Games;
 
 
 using Senac.PixelHub.Infrastructure.DatabaseConfiguration;
