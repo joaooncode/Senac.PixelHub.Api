@@ -23,7 +23,23 @@ namespace Senac.PixelHub.Infrastructure.Repositories
         {
             return await _connectionFactory.CreateConnection()
                 .QueryAsync<GameEntity>(
-                    @"SELECT id, title FROM games ORDER BY title"
+                    @"SELECT g.id, g.title, g.isAvailable, c.Name AS Category FROM Games g JOIN Categories c ON g.Category = c.Id ORDER BY title"
+                );
+        }
+
+        public async Task<GameEntity> GetGameById(long id)
+        {
+            return await _connectionFactory.CreateConnection()
+                .QueryFirstOrDefaultAsync<GameEntity>(
+                    @"SELECT g.Id,
+                             g.Title,
+                             g.Description,
+                             c.Name as Categories,
+                             g.IsAvailable,
+                             g.ReturnDate   
+                               FROM Games g
+                                INNER JOIN Categories c ON c.Id = g.Category
+                                     WHERE g.Id = @Id", new { Id = id}
                 );
         }
     }

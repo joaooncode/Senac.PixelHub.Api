@@ -8,7 +8,12 @@
 
         public bool IsOverdue { get; set; }
 
+        public string Category { get; set; }
+
         public DateTime WithdrawalDate { get; set; }
+
+        public DateTime ReturnDate { get; set; }
+
 
     }
 }

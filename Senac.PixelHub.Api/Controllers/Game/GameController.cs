@@ -24,4 +24,14 @@ public class GameController : Controller
         return Ok(getAllGamesResponse);
     }
 
+    [HttpGet("{id}")]
+
+    public async Task<IActionResult> GetGameById(long id)
+    {
+        var getGameByIdResponse = await _gameService.GetGameById(id);
+
+        return Ok(getGameByIdResponse);
+    }
+    
+
 }
