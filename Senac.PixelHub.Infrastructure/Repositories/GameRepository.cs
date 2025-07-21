@@ -39,8 +39,18 @@ namespace Senac.PixelHub.Infrastructure.Repositories
                              g.ReturnDate   
                                FROM Games g
                                 INNER JOIN Categories c ON c.Id = g.Category
-                                     WHERE g.Id = @Id", new { Id = id}
+                                     WHERE g.Id = @Id", new { Id = id }
                 );
+        }
+
+        public Task<GameEntity> RentGame(long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateGame(GameEntity game)
+        {
+            throw new NotImplementedException();
         }
     }
 }
