@@ -77,16 +77,16 @@ namespace Senac.PixelHub.Infrastructure.Service
 
             game.IsAvailable = false;
 
-            int diasEntrega = game.Category switch
+            int dueDays = game.Category switch
             {
-                CategoriesEnum.BRONZE => 9,
-                CategoriesEnum.SILVER=> 6,
-                CategoriesEnum.GOLD => 3,
+                CategoriesEnum.BRONZE => 10,
+                CategoriesEnum.SILVER=> 9,
+                CategoriesEnum.GOLD => 8,
+                CategoriesEnum.PLATINUM=> 7,
                 CategoriesEnum.DIAMOND => 2,
-
             };
 
-            game.ReturnDate = DateTime.UtcNow.AddDays(diasEntrega);
+            game.ReturnDate = DateTime.UtcNow.AddDays(dueDays);
 
             await _gameRepository.UpdateGame(game);
 
@@ -97,6 +97,11 @@ namespace Senac.PixelHub.Infrastructure.Service
                 Responsible = game.Responsible,
                 ReturnDate = game.ReturnDate
             };
+        }
+
+        public Task UpdateGame(long id, UpdateGameRequest updateGameRequest)
+        {
+            throw new NotImplementedException();
         }
     }
 }
