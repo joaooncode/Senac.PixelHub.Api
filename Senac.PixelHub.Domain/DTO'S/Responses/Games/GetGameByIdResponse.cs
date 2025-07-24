@@ -17,6 +17,6 @@ namespace Senac.PixelHub.Domain.Responses.Games
 
         public DateTime ReturnDate { get; set; }
 
-        public CategoriesEnum Category { get; set; }
+        public string Category { get; set; }
     }
 }

@@ -36,7 +36,24 @@ public class GameController : Controller
     }
 
 
-    [HttpPut("{id}/alugar")]
+    [HttpPost("/create")]
+
+    public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest createGameRequest)
+    {
+        try
+        {
+            var createGameResponse = await _gameService.CreateGame(createGameRequest);
+
+            return Ok(createGameResponse);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+    [HttpPut("{id}/rent")]
 
     public async Task<IActionResult> RentGame(long id, [FromBody] RentGameRequest rentGameRequest)
     {
@@ -57,6 +74,25 @@ public class GameController : Controller
 
     }
 
+    [HttpPut("{id}/return")]
+
+    public async Task<IActionResult> ReturnGame(long id)
+    {
+        try
+        {
+            var returnGameResponse = await _gameService.ReturnGame(id);
+
+            return Ok(returnGameResponse);
+
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception(ex.Message);
+        }
+    }
+
+
     [HttpPut("{id}/update")]
 
     public async Task<IActionResult> UpdateGame(long id, [FromBody] UpdateGameRequest updateGameRequest)
@@ -72,6 +108,22 @@ public class GameController : Controller
             throw new Exception(ex.Message);
         }
 
+    }
+
+    [HttpDelete("{id}/delete")]
+
+    public async Task<IActionResult> DeleteGame(long id)
+    {
+        try
+        {
+            await _gameService.DeleteGame(id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception(ex.Message);
+        }
     }
 
 }

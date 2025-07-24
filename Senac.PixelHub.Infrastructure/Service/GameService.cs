@@ -1,4 +1,6 @@
 ﻿using Senac.PixelHub.Domain.DTO_S.Requests.Game;
+using Senac.PixelHub.Domain.DTO_S.Responses;
+using Senac.PixelHub.Domain.DTO_S.Responses.Games;
 using Senac.PixelHub.Domain.Entities;
 using Senac.PixelHub.Domain.Entities.Enums;
 using Senac.PixelHub.Domain.Repositories.Games;
@@ -17,6 +19,50 @@ namespace Senac.PixelHub.Infrastructure.Service
             _gameRepository = gameRepository;
         }
 
+        public Task<CreateGameResponse> CreateGame(CreateGameRequest createGameRequest)
+        {
+            bool isCategoryValid = Enum.TryParse(createGameRequest.Category, ignoreCase: true, out CategoriesEnum category);
+
+            if (!isCategoryValid)
+            {
+                throw new Exception($"Categoria {createGameRequest.Category} inválida");
+
+            }
+
+            try
+            {
+                var game = new GameEntity
+                {
+                    Title = createGameRequest.Title,
+                    Description = createGameRequest.Description,
+                    Category = category
+                };
+
+                long gameIdResponse = await _gameRepository.CreateGame(game);
+
+                var response = new CreateGameResponse
+                {
+                    Id = gameIdResponse,
+                };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task DeleteGame(long id)
+        {
+            var game = await _gameRepository.GetGameById(id);
+
+            if (game == null)
+            {
+                throw new Exception($"Nenhum jogo encontrado com id {id}");
+            }
+
+            await _gameRepository.DeleteGame(id);
+        }
 
         public async Task<IEnumerable<GetAllGamesResponse>> GetAllGames()
         {
@@ -37,15 +83,15 @@ namespace Senac.PixelHub.Infrastructure.Service
                 throw new ArgumentException($"No game found with the id {id}");
             }
 
-            return new GetGameByIdResponse 
-            { 
+            return new GetGameByIdResponse
+            {
                 Id = game.Id,
                 Title = game.Title,
-                Category = game.Category,
+                Category = game.Category.ToString(),
                 Description = game.Description,
                 IsAvailable = game.IsAvailable,
                 Responsible = game.Responsible,
-                ReturnDate = game.ReturnDate 
+                ReturnDate = game.ReturnDate
             };
 
         }
@@ -88,7 +134,7 @@ namespace Senac.PixelHub.Infrastructure.Service
 
             game.ReturnDate = DateTime.UtcNow.AddDays(dueDays);
 
-            await _gameRepository.UpdateGame(game);
+            await _gameRepository.RentGame(game);
 
 
             return new RentGameResponse
@@ -99,9 +145,65 @@ namespace Senac.PixelHub.Infrastructure.Service
             };
         }
 
-        public Task UpdateGame(long id, UpdateGameRequest updateGameRequest)
+        public async Task<ReturnGameResponse> ReturnGame(long id)
         {
-            throw new NotImplementedException();
+            var game = await _gameRepository.GetGameById(id);
+
+           
+
+            if (game == null)
+            {
+                throw new Exception($"Nenhum jogo encontrado com o id {id}");
+            }
+
+            if (game.IsAvailable)
+            {
+                throw new Exception($"O jogo {game.Title} não está alugado");
+            }
+
+            await _gameRepository.ReturnGame(id);
+
+            return new ReturnGameResponse
+            {
+                IsAvailable = game.IsAvailable,
+                Resposible = game.Responsible,
+                ReturnDate = game.ReturnDate
+            };
+
+        }
+
+        public async Task UpdateGame(long id, UpdateGameRequest updateGameRequest)
+        {
+            bool isCategoryValid = Enum.TryParse(updateGameRequest.Category, ignoreCase: true, out CategoriesEnum category);
+
+            if (!isCategoryValid)
+            {
+                throw new Exception($"Categoria {updateGameRequest.Category}");
+            }
+
+
+            try
+            {
+                var game = await _gameRepository.GetGameById(id);
+
+                if (game == null)
+                {
+                    throw new Exception($"Nenhum jogo encontrado com o id: {id}");
+                }
+
+                game.Description = updateGameRequest.Description;
+                game.Category = category;
+                game.Title = updateGameRequest.Title;
+
+
+                await _gameRepository.UpdateGame(game);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception($"Erro ao atualizar jogo: {ex.Message}");
+            }
         }
     }
 }

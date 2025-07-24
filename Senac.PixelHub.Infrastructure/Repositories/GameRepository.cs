@@ -19,6 +19,37 @@ namespace Senac.PixelHub.Infrastructure.Repositories
             _connectionFactory = connectionFactory;
         }
 
+        public async Task<long> CreateGame(GameEntity game)
+        {
+            return await _connectionFactory.CreateConnection()
+                .QueryFirstOrDefaultAsync<long>(
+                @"INSERT INTO Games(
+                   Title,
+                   Description,
+                   Category,
+                   Responsible,
+                   IsAvailable,
+                   ReturnDate
+                ) OUTPUT INSERTED.Id
+                  VALUES(
+                    @Title,
+                    @Description,
+                    @Category,
+                    NULL,
+                    
+                )"
+);
+        }
+
+        public async Task DeleteGame(long id)
+        {
+             await _connectionFactory.CreateConnection()
+                .QueryFirstOrDefaultAsync<GameEntity>(@"DELETE FROM Games WHERE Id = @Id", new
+                {
+                    Id= id
+                });
+        }
+
         public async Task<IEnumerable<GameEntity>> GetAllGames()
         {
             return await _connectionFactory.CreateConnection()
@@ -31,26 +62,63 @@ namespace Senac.PixelHub.Infrastructure.Repositories
         {
             return await _connectionFactory.CreateConnection()
                 .QueryFirstOrDefaultAsync<GameEntity>(
-                    @"SELECT g.Id,
-                             g.Title,
-                             g.Description,
-                             c.Name as Categories,
-                             g.IsAvailable,
-                             g.ReturnDate   
-                               FROM Games g
-                                INNER JOIN Categories c ON c.Id = g.Category
-                                     WHERE g.Id = @Id", new { Id = id }
+@"SELECT g.Id,
+         g.Title,
+         g.Description,
+         c.Id as Category,
+         g.IsAvailable,
+         g.ReturnDate   
+           FROM Games g
+            INNER JOIN Categories c ON c.Id = g.Category
+                 WHERE g.Id = @Id", new { Id = id }
                 );
         }
 
-        public Task<GameEntity> RentGame(long id)
+        public async Task<GameEntity> RentGame(GameEntity game)
         {
-            throw new NotImplementedException();
+            return await _connectionFactory.CreateConnection()
+                .QueryFirstOrDefaultAsync<GameEntity>(
+                    @"UPDATE Games SET 
+                                    Responsible = @Responsible,
+                                    IsAvailable = @IsAvailable, 
+                                    ReturnDate = @ReturnDate  
+                                        WHERE Id = @Id",
+new
+{
+    Id = game.Id,
+    Responsible = game.Responsible,
+    IsAvailable = game.IsAvailable,
+    ReturnDate = game.ReturnDate
+}
+                );
         }
 
-        public Task UpdateGame(GameEntity game)
+        public async Task ReturnGame(long id)
         {
-            throw new NotImplementedException();
+            await _connectionFactory.CreateConnection()
+                .QueryFirstOrDefaultAsync<GameEntity>(@"UPDATE Games SET IsAvailable = 1, Responsible = NULL, ReturnDate = NULL WHERE Id = @Id", new
+                {
+                    Id =  id
+                });
+        }
+
+        public async Task UpdateGame(GameEntity game)
+        {
+            await _connectionFactory.CreateConnection()
+                .QueryFirstOrDefaultAsync<GameEntity>
+                (
+                    @"UPDATE Games SET 
+                                    Title = @Title, 
+                                    Description = @Description, 
+                                    Category = @Category
+                                        WHERE Id = @Id
+", new{
+    Id = game.Id,
+    Title = game.Title,
+    Description = game.Description,
+    Category = (int)game.Category,
+});
+
         }
     }
 }
