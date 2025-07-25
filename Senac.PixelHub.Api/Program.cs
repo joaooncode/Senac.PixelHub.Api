@@ -21,7 +21,7 @@ builder.Services.AddScoped<IGameRepository, GameRepository>();
 
 builder.Services.AddScoped<IDbConnectionFactory>(x =>
 {
-    return new DbConnectionFactory("Server=(localdb)\\MSSQLLocalDB; Database=PixelHub; Trusted_Connection=True");
+    return new DbConnectionFactory("Server=JOAO;User=sa; Password=QaeTpHQJsXZP!DCkw4dM; Database=PixelHub; Trusted_Connection=True; TrustServerCertificate=True");
 });
 
 

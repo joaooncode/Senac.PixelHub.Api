@@ -19,7 +19,7 @@ namespace Senac.PixelHub.Infrastructure.Service
             _gameRepository = gameRepository;
         }
 
-        public Task<CreateGameResponse> CreateGame(CreateGameRequest createGameRequest)
+        public async Task<CreateGameResponse> CreateGame(CreateGameRequest createGameRequest)
         {
             bool isCategoryValid = Enum.TryParse(createGameRequest.Category, ignoreCase: true, out CategoriesEnum category);
 
@@ -44,12 +44,16 @@ namespace Senac.PixelHub.Infrastructure.Service
                 {
                     Id = gameIdResponse,
                 };
+                
+                return response;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw new Exception($"Erro ao criar jogo: {ex.Message}");
             }
+
+          
         }
 
         public async Task DeleteGame(long id)

@@ -32,12 +32,18 @@ namespace Senac.PixelHub.Infrastructure.Repositories
                    ReturnDate
                 ) OUTPUT INSERTED.Id
                   VALUES(
-                    @Title,
-                    @Description,
-                    @Category,
-                    NULL,
-                    
-                )"
+            @Title,
+            @Description,
+            @Category,
+            NULL,
+            1,
+            NULL
+        )", new
+        {
+            Title = game.Title,
+            Description = game.Description,
+            Category = (int)game.Category,
+        }
 );
         }
 
@@ -54,8 +60,16 @@ namespace Senac.PixelHub.Infrastructure.Repositories
         {
             return await _connectionFactory.CreateConnection()
                 .QueryAsync<GameEntity>(
-                    @"SELECT g.id, g.title, g.isAvailable, c.Name AS Category FROM Games g JOIN Categories c ON g.Category = c.Id ORDER BY title"
-                );
+                    @"SELECT g.Id, 
+                     g.Title, 
+                     g.Description,
+                     g.IsAvailable, 
+                     g.Responsible,
+                     g.ReturnDate,
+                     g.Category 
+              FROM Games g 
+              ORDER BY g.Title"
+        );
         }
 
         public async Task<GameEntity> GetGameById(long id)
